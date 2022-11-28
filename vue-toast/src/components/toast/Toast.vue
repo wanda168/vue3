@@ -7,38 +7,53 @@
       <div class="toast-title">{{ title }}</div>
       <div class="toast-message">{{ message }}</div>
     </div>
-    <button class="toast-button">&times;</button>
+    <button class="toast-button" @click="$emit('hide')">&times;</button>
   </div>
 </template>
 
 <script>
-  import IconError from './IconError.vue';
-  import IconWarning from './IconWarning.vue';
-  import IconSuccess from './IconSuccess.vue';
+import IconError from "./IconError.vue";
+import IconWarning from "./IconWarning.vue";
+import IconSuccess from "./IconSuccess.vue";
 
-  export default {
-    // props: ['title', 'message', 'show'],
-    props: {
-      message: {
-        type: String,
-        required: true
-      },
-      title: {
-        type: String,
-        default: "Success"
-      },
-      show: {
-        type: Boolean,
-        default: false,
+export default {
+  emits: ["hide"],
+  data: () => ({
+    timeout: null,
+  }),
+  mounted() {},
+  beforeUnmount() {},
+  watch: {
+    show() {
+      if (this.timeout) {
+        clearTimeout(this.timeout);
       }
-    },
-    components: {
-      IconError,
-      IconWarning,
-      IconSuccess,
-    }
-  }
 
+      this.timeout = setTimeout(() => {
+        this.$emit("hide");
+      }, 3000);
+    },
+  },
+  props: {
+    message: {
+      type: String,
+      required: true,
+    },
+    title: {
+      type: String,
+      default: "Success",
+    },
+    show: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  components: {
+    IconError,
+    IconWarning,
+    IconSuccess,
+  },
+};
 </script>
 
 <style scoped lang="css">
@@ -105,6 +120,4 @@
 .toast-button:hover {
   opacity: 1;
 }
-
-
 </style>
