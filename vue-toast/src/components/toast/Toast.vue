@@ -1,11 +1,11 @@
 <template>
-  <div class="toast">
+  <div class="toast" v-show="show">
     <div class="toast-icon">
       <IconSuccess />
     </div>
     <div class="toast-content">
-      <div class="toast-title">Success</div>
-      <div class="toast-message">Data has been saved</div>
+      <div class="toast-title">{{ title }}</div>
+      <div class="toast-message">{{ message }}</div>
     </div>
     <button class="toast-button">&times;</button>
   </div>
@@ -17,6 +17,21 @@
   import IconSuccess from './IconSuccess.vue';
 
   export default {
+    // props: ['title', 'message', 'show'],
+    props: {
+      message: {
+        type: String,
+        required: true
+      },
+      title: {
+        type: String,
+        default: "Success"
+      },
+      show: {
+        type: Boolean,
+        default: false,
+      }
+    },
     components: {
       IconError,
       IconWarning,
