@@ -1,10 +1,10 @@
 <template>
   <button @click="showToast = true">Show Toast</button>
   <Toast
-    title="Yes"
     message="Message has been sent!"
     :show="showToast"
     @hide="showToast = false"
+    type="error"
   />
 </template>
 

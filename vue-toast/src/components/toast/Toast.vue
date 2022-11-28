@@ -1,10 +1,10 @@
 <template>
-  <div class="toast" v-show="show">
+  <div class="toast" :class="toastType" v-show="show">
     <div class="toast-icon">
-      <IconSuccess />
+      <component :is="toastIcon"></component>
     </div>
     <div class="toast-content">
-      <div class="toast-title">{{ title }}</div>
+      <div class="toast-title">{{ toastTitle }}</div>
       <div class="toast-message">{{ message }}</div>
     </div>
     <button class="toast-button" @click="$emit('hide')">&times;</button>
@@ -41,11 +41,36 @@ export default {
     },
     title: {
       type: String,
-      default: "Success",
+      default: null,
     },
     show: {
       type: Boolean,
       default: false,
+    },
+    type: {
+      type: String,
+      default: "success",
+      validator: function (value) {
+        return ["success", "warning", "error"].indexOf(value) !== -1;
+      },
+    },
+  },
+  computed: {
+    toastType() {
+      return `toast-${this.getType}`;
+    },
+    toastIcon() {
+      return `icon-${this.getType}`;
+    },
+    getType() {
+      return ["success", "warning", "error"].indexOf(this.type) === -1
+        ? "success"
+        : this.type;
+    },
+    toastTitle() {
+      return this.title
+        ? this.title
+        : this.type.charAt(0).toUpperCase() + this.type.slice(1);
     },
   },
   components: {
@@ -59,7 +84,6 @@ export default {
 <style scoped lang="css">
 .toast {
   width: 300px;
-  background-color: #ecfdf5;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -72,7 +96,6 @@ export default {
   content: "";
   width: 4px;
   height: 100%;
-  background-color: #34d399;
   position: absolute;
   top: 0;
   left: 0;
@@ -81,13 +104,47 @@ export default {
 .toast-icon {
   width: 16px;
   height: 16px;
-  background-color: #34d399;
   border-radius: 50%;
   padding: 7px;
 }
 
-.toast-icon svg {
+.toast-success .toast-icon svg {
   fill: #ecfdf5;
+}
+
+.toast-success {
+  background: #ecfdf5;
+}
+
+.toast-success::before,
+.toast-success .toast-icon {
+  background: #34d399;
+}
+
+.toast-warning .toast-icon svg {
+  fill: #fffbeb;
+}
+
+.toast-warning {
+  background: #fffbeb;
+}
+
+.toast-warning::before,
+.toast-warning .toast-icon {
+  background: #f59e0b;
+}
+
+.toast-error .toast-icon svg {
+  fill: #f3f2f2;
+}
+
+.toast-error {
+  background: #fef2f2;
+}
+
+.toast-error::before,
+.toast-error .toast-icon {
+  background: #ef4444;
 }
 
 .toast-content {
@@ -106,18 +163,57 @@ export default {
 }
 
 .toast-button {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.5em;
+  height: 1.5em;
   border: none;
   padding: 0;
   color: #9ca3af;
   opacity: 0.7;
-  background-color: transparent;
+  background: transparent;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.5em;
 }
 
 .toast-button:hover {
   opacity: 1;
+}
+
+.bottom-left {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+}
+.top-left {
+  position: fixed;
+  left: 20px;
+  top: 20px;
+}
+.bottom-right {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+}
+.top-right {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+}
+.rtl-enter-active,
+.rtl-leave-active,
+.ltr-enter-active,
+.ltr-leave-active {
+  transition: all 0.5s ease-in-out;
+}
+.rtl-enter-from,
+.rtl-leave-to {
+  transform: translateX(100%);
+}
+.ltr-enter-from,
+.ltr-leave-to {
+  transform: translateX(-100%);
+}
+.rtl-leave-to,
+.ltr-leave-to {
+  opacity: 0;
 }
 </style>
