@@ -1,14 +1,16 @@
 <template>
-  <div class="toast" :class="toastClasses" v-show="show">
-    <div class="toast-icon">
-      <component :is="toastIcon"></component>
+  <transition :name="transitionName">
+    <div class="toast" :class="toastClasses" v-show="show">
+      <div class="toast-icon">
+        <component :is="toastIcon"></component>
+      </div>
+      <div class="toast-content">
+        <div class="toast-title">{{ toastTitle }}</div>
+        <div class="toast-message">{{ message }}</div>
+      </div>
+      <button class="toast-button" @click="$emit('hide')">&times;</button>
     </div>
-    <div class="toast-content">
-      <div class="toast-title">{{ toastTitle }}</div>
-      <div class="toast-message">{{ message }}</div>
-    </div>
-    <button class="toast-button" @click="$emit('hide')">&times;</button>
-  </div>
+  </transition>
 </template>
 
 <script>
@@ -21,8 +23,6 @@ export default {
   data: () => ({
     timeout: null,
   }),
-  mounted() {},
-  beforeUnmount() {},
   watch: {
     show() {
       if (this.timeout) {
@@ -60,6 +60,15 @@ export default {
     },
   },
   computed: {
+    transitionName() {
+      const transitions = {
+        "top-left": "ltr",
+        "bottom-left": "ltr",
+        "top-right": "rtl",
+        "bottom-right": "rtl",
+      };
+      return transitions[this.getPosition];
+    },
     toastType() {
       return `toast-${this.getType}`;
     },
@@ -78,7 +87,7 @@ export default {
         ? "bottom-right"
         : this.position;
     },
-    toastClasses(){
+    toastClasses() {
       return [this.toastType, this.getPosition];
     },
     toastTitle() {
@@ -95,7 +104,7 @@ export default {
 };
 </script>
 
-<style scoped lang="css">
+<style scoped>
 .toast {
   width: 300px;
   display: flex;
