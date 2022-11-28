@@ -7,20 +7,62 @@
         :key="`slide-${index}`"
         :current-slide="currentSlide"
         :index="index"
+        :direction="direction"
       ></carousel-item>
+      <carousel-controls @prev="prev" @next="next"></carousel-controls>
     </div>
   </div>
 </template>
 
 <script>
 import CarouselItem from "./CarouselItem.vue";
+import CarouselControls from "./CarouselControls.vue";
 
 export default {
   props: ["slides"],
-  components: { CarouselItem },
+  components: { CarouselItem, CarouselControls },
   data: () => ({
     currentSlide: 0,
+    slideInterval: null,
+    direction: "right",
   }),
+  mounted() {
+    this.startSlideTimer();
+  },
+  beforeUnmount() {
+    this.stopSlideTimer();
+  },
+  methods: {
+    stopSlideTimer() {
+      clearInterval(this.slideInterval);
+    },
+    startSlideTimer() {
+      this.stopSlideTimer();
+      this.slideInterval = setInterval(() => {
+        this._next();
+      }, 3000);
+    },
+    setCurrentSlide(index) {
+      this.currentSlide = index;
+    },
+    prev() {
+      const index =
+        this.currentSlide > 0 ? this.currentSlide - 1 : this.slides.length - 1;
+      this.setCurrentSlide(index);
+      this.direction = "left";
+      this.stopSlideTimer();
+    },
+    _next() {
+      const index =
+        this.currentSlide < this.slides.length - 1 ? this.currentSlide + 1 : 0;
+      this.setCurrentSlide(index);
+      this.direction = "right";
+    },
+    next() {
+      this._next();
+      this.stopSlideTimer();
+    },
+  },
 };
 </script>
 
