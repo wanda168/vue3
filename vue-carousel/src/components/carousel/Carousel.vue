@@ -1,6 +1,12 @@
 <template>
   <div class="carousel">
-    <div class="carousel-inner">
+    <div class="carousel-inner" :style="dimention">
+      <carousel-indicators
+        v-if="indicators"
+        :count="slides.length"
+        :active="currentSlide"
+        @switch="switchSlide($event)"
+      ></carousel-indicators>
       <carousel-item
         v-for="(slide, index) in slides"
         :slide="slide"
@@ -8,8 +14,14 @@
         :current-slide="currentSlide"
         :index="index"
         :direction="direction"
+        @mouseenter="stopSlideTimer"
+        @mouseout="startSlideTimer"
       ></carousel-item>
-      <carousel-controls @prev="prev" @next="next"></carousel-controls>
+      <carousel-controls
+        v-if="controls"
+        @prev="prev"
+        @next="next"
+      ></carousel-controls>
     </div>
   </div>
 </template>
@@ -17,10 +29,44 @@
 <script>
 import CarouselItem from "./CarouselItem.vue";
 import CarouselControls from "./CarouselControls.vue";
+import CarouselIndicators from "./CarouselIndicators.vue";
 
 export default {
-  props: ["slides"],
-  components: { CarouselItem, CarouselControls },
+  props: {
+    slides: {
+      type: Array,
+      required: true,
+    },
+    controls: {
+      type: Boolean,
+      default: false,
+    },
+    indicators: {
+      type: Boolean,
+      default: false,
+    },
+    interval: {
+      type: Number,
+      default: 5000,
+    },
+    width: {
+      type: Number,
+      default: 900,
+    },
+    height: {
+      type: Number,
+      default: 400,
+    },
+  },
+  computed: {
+    dimention() {
+      return {
+        width: this.width + "px",
+        height: this.height + "px",
+      };
+    },
+  },
+  components: { CarouselItem, CarouselControls, CarouselIndicators },
   data: () => ({
     currentSlide: 0,
     slideInterval: null,
@@ -33,6 +79,14 @@ export default {
     this.stopSlideTimer();
   },
   methods: {
+    switchSlide(index) {
+      const step = index - this.currentSlide;
+      if (step > 0) {
+        this.next(step);
+      } else {
+        this.prev(step);
+      }
+    },
     stopSlideTimer() {
       clearInterval(this.slideInterval);
     },
@@ -40,27 +94,31 @@ export default {
       this.stopSlideTimer();
       this.slideInterval = setInterval(() => {
         this._next();
-      }, 3000);
+      }, this.interval);
     },
     setCurrentSlide(index) {
       this.currentSlide = index;
     },
-    prev() {
+    prev(step = -1) {
       const index =
-        this.currentSlide > 0 ? this.currentSlide - 1 : this.slides.length - 1;
+        this.currentSlide > 0
+          ? this.currentSlide + step
+          : this.slides.length - 1;
       this.setCurrentSlide(index);
       this.direction = "left";
-      this.stopSlideTimer();
+      this.startSlideTimer();
     },
-    _next() {
+    _next(step = 1) {
       const index =
-        this.currentSlide < this.slides.length - 1 ? this.currentSlide + 1 : 0;
+        this.currentSlide < this.slides.length - 1
+          ? this.currentSlide + step
+          : 0;
       this.setCurrentSlide(index);
       this.direction = "right";
     },
-    next() {
-      this._next();
-      this.stopSlideTimer();
+    next(step = 1) {
+      this._next(step);
+      this.startSlideTimer();
     },
   },
 };
@@ -71,11 +129,8 @@ export default {
   display: flex;
   justify-content: center;
 }
-
 .carousel-inner {
   position: relative;
-  width: 900px;
-  height: 400px;
   overflow: hidden;
 }
 </style>

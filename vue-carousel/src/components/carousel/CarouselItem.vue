@@ -1,13 +1,19 @@
 <template>
   <transition :name="transitionName">
-    <div class="carousel-item" v-show="currentSlide === index">
-      <img :src="slide" draggable="false" />
+    <div
+      class="carousel-item"
+      v-show="currentSlide === index"
+      @mouseenter="$emit('mouseenter')"
+      @mouseout="$emit('mouseout')"
+    >
+      <img :src="slide" draggable="false"/>
     </div>
   </transition>
 </template>
 
 <script>
 export default {
+  emits: ["mouseenter", "mouseout"],
   props: ["slide", "currentSlide", "index", "direction"],
   computed: {
     transitionName() {
@@ -32,19 +38,15 @@ export default {
 .slide-in-leave-active {
   transition: all 1s ease-in-out;
 }
-
 .slide-out-enter-from {
   transform: translateX(100%);
 }
-
 .slide-out-leave-to {
   transform: translateX(-100%);
 }
-
 .slide-in-enter-from {
   transform: translateX(-100%);
 }
-
 .slide-in-leave-to {
   transform: translateX(100%);
 }
